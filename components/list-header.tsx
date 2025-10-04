@@ -1,4 +1,5 @@
 import { CATEGORIES } from "@/assets/categories";
+import { useCartStore } from "@/src/store/cart-store";
 import { Entypo, FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
@@ -13,6 +14,10 @@ import {
 } from "react-native";
 
 export default function ListHeader() {
+  const itemCount = useCartStore((state) =>
+    state.items.reduce((count, item) => count + item.quantity, 0)
+  );
+
   return (
     <View style={[styles.headerContainer]}>
       <View style={styles.headerTop}>
@@ -38,7 +43,7 @@ export default function ListHeader() {
                   />
 
                   <View style={styles.badgeContainer}>
-                    <Text style={styles.badgeText}>{1}</Text>
+                    <Text style={styles.badgeText}>{itemCount}</Text>
                   </View>
                 </View>
               )}
