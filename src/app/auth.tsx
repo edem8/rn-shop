@@ -31,9 +31,7 @@ export default function Auth() {
     console.log(data);
   };
 
-  const signUp = () => {
-
-  }
+  const signUp = () => {};
   return (
     <ImageBackground
       style={styles.backgroundImage}
