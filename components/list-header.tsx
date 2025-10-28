@@ -1,6 +1,7 @@
 import { CATEGORIES } from "@/assets/categories";
+import { supabase } from "@/src/lib/superbase";
 import { useCartStore } from "@/src/store/cart-store";
-import { Entypo, FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
 import {
@@ -17,6 +18,11 @@ export default function ListHeader() {
   const itemCount = useCartStore((state) =>
     state.items.reduce((count, item) => count + item.quantity, 0)
   );
+
+  const handleSignOut = async () => {
+    console.log("Signing out...");
+    await supabase.auth.signOut();
+  };
 
   return (
     <View style={[styles.headerContainer]}>
@@ -35,7 +41,7 @@ export default function ListHeader() {
             <Pressable>
               {({ pressed }) => (
                 <View>
-                  <Entypo
+                  <FontAwesome
                     name="shopping-cart"
                     size={25}
                     color="gray"
@@ -49,8 +55,12 @@ export default function ListHeader() {
               )}
             </Pressable>
           </Link>
-          <TouchableOpacity onPress={() => {}} style={styles.signOutButton}>
-            <FontAwesome name="sign-out" size={25} color="gray" />
+
+          <TouchableOpacity
+            onPress={handleSignOut}
+            style={styles.signOutButton}
+          >
+            <FontAwesome name="sign-out" size={25} color="red" />
           </TouchableOpacity>
         </View>
       </View>
@@ -92,6 +102,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingHorizontal: 10,
   },
   headerLeft: {
     flexDirection: "row",

@@ -33,19 +33,19 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
       setSession(session);
 
-      // if (session) {
-      //   const { data: user, error } = await supabase
-      //     .from("users")
-      //     .select("*")
-      //     .eq("id", session.user.id)
-      //     .single();
+      if (session) {
+        const { data: user, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
 
-      //   if (error) {
-      //     console.error("Error fetching user:", error);
-      //   } else {
-      //     setUser(user);
-      //   }
-      // }
+        if (error) {
+          console.error("Error fetching user:", error);
+        } else {
+          setUser(user);
+        }
+      }
       setMounting(false);
     };
 
