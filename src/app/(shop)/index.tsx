@@ -1,14 +1,21 @@
 import { PRODUCTS } from "@/assets/products";
 import ListHeader from "@/components/list-header";
 import ProductListItem from "@/components/product-list-item";
+import { getProductsAndCategories } from "@/src/api/api";
 import React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function index() {
+  const { data, error, isPending } = getProductsAndCategories();
+
+  if (isPending) return <ActivityIndicator />
+
+  if (error) return <View><Text>{error.message || "An error occurred"}</Text></View>
+
   return (
     <View>
       <FlatList
-        data={PRODUCTS}
+        data={data.products}
         renderItem={({ item }) => <ProductListItem product={item} />}
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
