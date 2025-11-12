@@ -1,8 +1,9 @@
-import { PRODUCTS } from "@/assets/products";
+import { getProductDetail } from "@/src/api/api";
 import { useCartStore } from "@/src/store/cart-store";
 import { Redirect, Stack, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -15,16 +16,18 @@ import { useToast } from "react-native-toast-notifications";
 export default function ProductDetail() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const toast = useToast();
-  const product = PRODUCTS.find((product) => product.slug === slug);
-
-  if (!product) return <Redirect href="/" />;
+  const { data: product, error, isPending } = getProductDetail(slug);
 
   const { items, incrementItem, decrementItem, addItem } = useCartStore();
 
-  const cartItem = items.find((item) => item.id === product.id);
-  const initialQuantity = cartItem ? cartItem.quantity : 0;
-
+  const cartItem = items.find((item) => item.id === product?.id);
+  const initialQuantity = cartItem ? cartItem.quantity : 1;
   const [quantity, setQuantity] = useState(initialQuantity);
+
+  if (isPending) return <ActivityIndicator />;
+  if (error) return <Text>Error: {error.message}</Text>;
+  if (!product) return <Redirect href="/" />;
+
   const increaseQuantity = () => {
     if (quantity < product.maxQuantity) {
       setQuantity((prev) => prev + 1);
@@ -65,7 +68,7 @@ export default function ProductDetail() {
     <View style={styles.container}>
       <Stack.Screen options={{ title: product.title }} />
 
-      <Image source={product.heroImage} style={styles.heroImage} />
+      <Image source={{ uri: product.heroImage }} style={styles.heroImage} />
       <View style={{ padding: 16, flex: 1 }}>
         <Text style={styles.title}>Title: {product.title}</Text>
         <Text style={styles.slug}>Slug: {product.slug}</Text>
@@ -80,7 +83,7 @@ export default function ProductDetail() {
           data={product.imagesUrl}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <Image source={item} style={styles.image} />
+            <Image source={{ uri: item }} style={styles.image} />
           )}
           horizontal
           showsHorizontalScrollIndicator={false}

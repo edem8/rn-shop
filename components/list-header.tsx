@@ -1,6 +1,6 @@
-import { CATEGORIES } from "@/assets/categories";
 import { supabase } from "@/src/lib/superbase";
 import { useCartStore } from "@/src/store/cart-store";
+import { Tables } from "@/src/types/database.types";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
@@ -14,7 +14,7 @@ import {
   View,
 } from "react-native";
 
-export default function ListHeader() {
+export default function ListHeader({categories}:{categories:Tables<"category">[]}) {
   const itemCount = useCartStore((state) =>
     state.items.reduce((count, item) => count + item.quantity, 0)
   );
@@ -73,7 +73,7 @@ export default function ListHeader() {
       <View style={styles.categoriesContainer}>
         <Text style={styles.sectionTitle}>Categories</Text>
         <FlatList
-          data={CATEGORIES}
+          data={categories}
           renderItem={({ item }) => (
             <Link asChild href={`/categories/${item.slug}`}>
               <Pressable style={styles.category}>

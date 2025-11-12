@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/superbase";
+import { useAuth } from "../providers/auth-provider";
 
-export const getProductsAndCategories =  () => {
+export const getProductsAndCategories = () => {
   return useQuery({
     queryKey: ["products", "categories"],
     queryFn: async () => {
@@ -15,6 +16,81 @@ export const getProductsAndCategories =  () => {
       }
 
       return { products: products.data, categories: categories.data };
+    },
+  });
+};
+
+export const getProductDetail = (slug: string) => {
+  return useQuery({
+    queryKey: ["product", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product")
+        .select("*")
+        .eq("slug", slug)
+        .single();
+
+      if (error || !data) {
+        throw new Error(
+          "An error occurred while fetching data: " + error?.message
+        );
+      }
+
+      return data;
+    },
+  });
+};
+
+export const getCategoryDetailWithProducts = (categorySlug: string) => {
+  return useQuery({
+    queryKey: ["categoryAndProducts", categorySlug],
+    queryFn: async () => {
+      const { data: category, error: categoryError } = await supabase
+        .from("category")
+        .select("*")
+        .eq("slug", categorySlug)
+        .single();
+
+      if (categoryError || !category) {
+        throw new Error("An error occurred while fetching category data");
+      }
+
+      const { data: products, error: productsError } = await supabase
+        .from("product")
+        .select("*")
+        .eq("category", category.id);
+
+      if (productsError) {
+        throw new Error("An error occurred while fetching products data");
+      }
+
+      return { category, products };
+    },
+  });
+};
+
+
+
+export const getMyOrders = () => {
+  const {
+    user: { id },
+  } = useAuth();
+
+  return useQuery({
+    queryKey: ['orders', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('order')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .eq('user', id);
+
+      if (error)
+        throw new Error(
+          'An error occurred while fetching orders: ' + error.message
+        );
+
+      return data;
     },
   });
 };
