@@ -1,8 +1,7 @@
-
-import { format } from 'date-fns';
 import { getMyOrders } from "@/src/api/api";
 import { Tables } from "@/src/types/database.types";
-import { Link } from "expo-router";
+import { format } from "date-fns";
+import { Link, Stack } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
@@ -45,14 +44,28 @@ export default function Orders() {
 
   if (!orders.length)
     return (
-      <View style={styles.container}>
-        <FlatList
-          data={orders}
-          keyExtractor={(Item) => Item.id.toString()}
-          renderItem={renderitem}
-        />
-      </View>
+      <Text
+        style={{
+          fontSize: 16,
+          color: "#555",
+          textAlign: "center",
+          padding: 10,
+        }}
+      >
+        No orders found
+      </Text>
     );
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen options={{ title: "My Orders" }} />
+      <FlatList
+        data={orders}
+        keyExtractor={(Item) => Item.id.toString()}
+        renderItem={renderitem}
+      />
+    </View>
+  );
 }
 
 const styles: { [key: string]: any } = StyleSheet.create({
